@@ -2,12 +2,14 @@
 
 Rocket::Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed) : 
 	rocketBody(size),
+	startPos(startPos),
 	mainThrustFire(sf::Vector2f(size.x / 1.5f, size.y / 1.5f)),
 	leftThrustFire(sf::Vector2f(size.x / 3.0f, size.y / 3.0f)),
 	rightThrustFire(sf::Vector2f(size.x / 3.0f, size.y / 3.0f))
 {
 	srand(ranSeed);
 
+	fitness = 1000.0;
 	velocity.x = 0;
 	velocity.y = 0;
 	angularVelocity = 0;
@@ -46,11 +48,6 @@ Rocket::Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed) :
 		else
 			rightThrustInst[i] = false;
 	}
-
-}
-
-Rocket::Rocket(const Rocket& rocket)
-{
 
 }
 
@@ -150,4 +147,47 @@ void Rocket::executeNextInst()
 
 	updatePosition();
 	currentInstruction++;
+}
+
+sf::Vector2f Rocket::getPosition()
+{
+	sf::Vector2f pos = rocketBody.getPosition();
+	return pos;
+}
+
+void Rocket::reset()
+{
+	rocketBody.setPosition(startPos);
+	rocketBody.setRotation(0);
+	heading = rocketBody.getRotation();
+	velocity.x = 0;
+	velocity.y = 0;
+	angularVelocity = 0;
+	currentInstruction = 0;
+	fitness = 1000;
+}
+
+void Rocket::copyInstructions(const Rocket& sourceRocket)
+{
+	for (int i = 0; i < NUM_INSTRUCTIONS; i++)
+	{
+		this->mainThrustInst[i] = sourceRocket.mainThrustInst[i];
+		this->leftThrustInst[i] = sourceRocket.leftThrustInst[i];
+		this->rightThrustInst[i] = sourceRocket.rightThrustInst[i];
+	}
+}
+
+void Rocket::mutate()
+{
+	int instructionIndex;
+
+	for (int i = 0; i < MUTATION_RATE; i++)
+	{
+		instructionIndex = rand() % NUM_INSTRUCTIONS;
+
+		if (mainThrustInst[instructionIndex])
+			mainThrustInst[instructionIndex] = false;
+		else
+			mainThrustInst[instructionIndex] = true;
+	}
 }
