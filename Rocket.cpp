@@ -1,6 +1,6 @@
 #include "Rocket.h"
 
-Rocket::Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed) : 
+Rocket::Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed, sf::Texture* rocketTexture, sf::Texture* thrusterTexture) :
 	rocketBody(size),
 	startPos(startPos),
 	mainThrustFire(sf::Vector2f(size.x / 1.5f, size.y / 1.5f)),
@@ -17,11 +17,11 @@ Rocket::Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed) :
 
 	rocketBody.setOrigin(sf::Vector2f(rocketBody.getSize().x / 2.0f, rocketBody.getSize().y / 2.0f));
 	rocketBody.setPosition(startPos);
-	rocketBody.setFillColor(sf::Color::Green);
+	rocketBody.setTexture(rocketTexture);
 
-	mainThrustFire.setFillColor(sf::Color::Red);
-	leftThrustFire.setFillColor(sf::Color::Red);
-	rightThrustFire.setFillColor(sf::Color::Red);
+	mainThrustFire.setTexture(thrusterTexture);
+	leftThrustFire.setTexture(thrusterTexture);
+	rightThrustFire.setTexture(thrusterTexture);
 
 	mainThrustFire.setOrigin(sf::Vector2f(mainThrustFire.getSize().x / 2.0f, mainThrustFire.getSize().y / 2.0f));
 	leftThrustFire.setOrigin(sf::Vector2f(leftThrustFire.getSize().x / 2.0f, leftThrustFire.getSize().y / 2.0f));
@@ -53,7 +53,7 @@ Rocket::Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed) :
 
 void Rocket::thrustMain()
 {
-	// SFML treats 0 degress as the top of the unit circle, so heading has to be offset
+	// SFML treats 0 degrees as the top of the unit circle, so heading has to be offset
 	velocity.x -= MAIN_THRUSTER * cos((heading + 90) * M_PI / 180);
 	velocity.y -= MAIN_THRUSTER * sin((heading + 90) * M_PI / 180);
 }
@@ -109,8 +109,8 @@ void Rocket::draw(sf::RenderWindow* window)
 void Rocket::setThrusterPositions()
 {
 	float x, y;
-	x = (rocketBody.getSize().y / 1.5) * cos((heading + 90) * M_PI / 180.0);
-	y = (rocketBody.getSize().y / 1.5) * sin((heading + 90) * M_PI / 180.0);
+	x = (rocketBody.getSize().y / 1.4) * cos((heading + 90) * M_PI / 180.0);
+	y = (rocketBody.getSize().y / 1.4) * sin((heading + 90) * M_PI / 180.0);
 
 	mainThrustFire.setPosition(rocketBody.getPosition());
 	mainThrustFire.move(sf::Vector2f(x, y));

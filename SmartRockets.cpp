@@ -4,7 +4,7 @@
 #include <time.h>
 #include "Rocket.h"
 
-const int NUM_ROCKETS = 100;
+const int NUM_ROCKETS = 20;
 
 float distanceBetweenVecs(sf::Vector2f vector1, sf::Vector2f vector2);
 void fitnessSort(Rocket* rockets[]);
@@ -14,19 +14,23 @@ int main()
 {
 	srand(time(NULL));
 
+	sf::Texture rocketTexture;
+	sf::Texture thrusterTexture;
 	sf::RenderWindow window(sf::VideoMode(600, 900), "Smart Rockets");
 	sf::Vector2f goal(300.0f, 25.0f);
 	sf::Clock refresh;
-	sf::Clock enginesOff;
 	int elapsedFrames = 0;
 	int generation = 1;
 	float distance;
 
 	Rocket* rockets[NUM_ROCKETS];
 
+	rocketTexture.loadFromFile("resources/sprites/rocket.png");
+	thrusterTexture.loadFromFile("resources/sprites/thruster.png");
+
 	for (int i = 0; i < NUM_ROCKETS; i++)
 	{
-		rockets[i] = new Rocket(sf::Vector2f(10.0f, 30.0f), sf::Vector2f(300.0f, 850.0f), rand());
+		rockets[i] = new Rocket(sf::Vector2f(20.0f, 60.0f), sf::Vector2f(300.0f, 850.0f), rand(), &rocketTexture, &thrusterTexture);
 	}
 
 	while (window.isOpen())
@@ -38,7 +42,7 @@ int main()
 				window.close();
 		}
 
-		if (refresh.getElapsedTime().asSeconds() > 0.016) 
+		if (refresh.getElapsedTime().asSeconds() > 0.004) 
 		{
 			refresh.restart();
 			for (int i = 0; i < NUM_ROCKETS; i++)
@@ -117,7 +121,7 @@ void createNextGen(Rocket* rockets[])
 {
 	int copySourceIndex = 0;
 
-	for (int i = NUM_ROCKETS - 1; i > NUM_ROCKETS / 2; i--)
+	for (int i = NUM_ROCKETS - 1; i > NUM_ROCKETS / 1.1; i--)
 	{
 		rockets[i]->copyInstructions((*rockets[copySourceIndex]));
 		copySourceIndex++;

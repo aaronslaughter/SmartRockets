@@ -13,7 +13,7 @@ public:
 	const int MUTATION_RATE = NUM_INSTRUCTIONS / 100;
 
 public:
-	Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed);
+	Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed, sf::Texture* rocketTexture, sf::Texture* thrusterTexture);
 	void executeNextInst();
 	sf::Vector2f getPosition();
 	void reset();
@@ -45,4 +45,5 @@ private:
 	bool mainThrustInst[NUM_INSTRUCTIONS];
 	bool leftThrustInst[NUM_INSTRUCTIONS];
 	bool rightThrustInst[NUM_INSTRUCTIONS];
+	bool crashed;
 };
