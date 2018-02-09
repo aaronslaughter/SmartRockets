@@ -16,6 +16,7 @@ public:
 	Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed, sf::Texture* rocketTexture, sf::Texture* thrusterTexture);
 	void executeNextInst();
 	sf::Vector2f getPosition();
+	sf::ConvexShape getRotatedShape();
 	void reset();
 	void draw(sf::RenderWindow* window);
 	void copyInstructions(const Rocket& sourceRocket);
@@ -23,6 +24,7 @@ public:
 
 public:
 	float fitness;
+	bool crashed;
 
 private:
 	void thrustMain();
@@ -45,5 +47,4 @@ private:
 	bool mainThrustInst[NUM_INSTRUCTIONS];
 	bool leftThrustInst[NUM_INSTRUCTIONS];
 	bool rightThrustInst[NUM_INSTRUCTIONS];
-	bool crashed;
 };

@@ -9,6 +9,7 @@ Rocket::Rocket(sf::Vector2f size, sf::Vector2f startPos, int ranSeed, sf::Textur
 {
 	srand(ranSeed);
 
+	crashed = false;
 	fitness = 1000.0;
 	velocity.x = 0;
 	velocity.y = 0;
@@ -76,22 +77,31 @@ void Rocket::applyGravity()
 
 void Rocket::updatePosition()
 {
-	applyGravity();
+	if (rocketBody.getPosition().x < 0 || rocketBody.getPosition().x > 600)
+		crashed = true;
 
-	heading += angularVelocity;
-	rocketBody.setRotation(heading);
+	if (rocketBody.getPosition().y < 0 || rocketBody.getPosition().y > 900)
+		crashed = true;
 
-	sf::Vector2f newPosition(rocketBody.getPosition().x, rocketBody.getPosition().y);
-	newPosition.x += velocity.x;
-	newPosition.y += velocity.y;
-	rocketBody.setPosition(newPosition);
-	
-	setThrusterPositions();
+	if (!crashed)
+	{
+		applyGravity();
+
+		heading += angularVelocity;
+		rocketBody.setRotation(heading);
+
+		sf::Vector2f newPosition(rocketBody.getPosition().x, rocketBody.getPosition().y);
+		newPosition.x += velocity.x;
+		newPosition.y += velocity.y;
+		rocketBody.setPosition(newPosition);
+
+		setThrusterPositions();
+	}
 }
 
 void Rocket::draw(sf::RenderWindow* window)
 {
-	if (currentInstruction < NUM_INSTRUCTIONS)
+	if (currentInstruction < NUM_INSTRUCTIONS && !crashed)
 	{
 		if (mainThrustInst[currentInstruction])
 			window->draw(mainThrustFire);
@@ -133,7 +143,7 @@ void Rocket::setThrusterPositions()
 
 void Rocket::executeNextInst()
 {
-	if (currentInstruction < NUM_INSTRUCTIONS)
+	if (currentInstruction < NUM_INSTRUCTIONS && !crashed)
 	{
 		if (mainThrustInst[currentInstruction])
 			thrustMain();
@@ -165,6 +175,7 @@ void Rocket::reset()
 	angularVelocity = 0;
 	currentInstruction = 0;
 	fitness = 1000;
+	crashed = false;
 }
 
 void Rocket::copyInstructions(const Rocket& sourceRocket)
@@ -179,15 +190,61 @@ void Rocket::copyInstructions(const Rocket& sourceRocket)
 
 void Rocket::mutate()
 {
-	int instructionIndex;
+	int instructionIndex, instructionType;
 
 	for (int i = 0; i < MUTATION_RATE; i++)
 	{
 		instructionIndex = rand() % NUM_INSTRUCTIONS;
+		instructionType = rand() % 3;
 
-		if (mainThrustInst[instructionIndex])
-			mainThrustInst[instructionIndex] = false;
-		else
-			mainThrustInst[instructionIndex] = true;
+		switch (instructionType)
+		{
+		case 1:	mainThrustInst[instructionIndex] ? mainThrustInst[instructionIndex] = false 
+			: mainThrustInst[instructionIndex] = true;
+			break;
+		case 2: leftThrustInst[instructionIndex] ? leftThrustInst[instructionIndex] = false 
+			: leftThrustInst[instructionIndex] = true;
+			break;
+		case 3:	rightThrustInst[instructionIndex] ? rightThrustInst[instructionIndex] = false 
+			: rightThrustInst[instructionIndex] = true;
+			break;
+		default:
+			break;
+		}
 	}
+}
+
+//////////////////
+// Returns a ConvexShape with the global coordinates of the rocketBody
+// with the rotation factored in. RectangleShape.getPoint() does not
+// adjust for rotation. Useful for SAT collision detection.
+// Assumes rocketBody is a rectangle and the origin is set
+// to the center.
+//////////////////
+sf::ConvexShape Rocket::getRotatedShape()
+{
+	sf::ConvexShape rotatedShape(4);
+	sf::Vector2f topVector, rightVector, bottomVector, leftVector;
+	float halfHeight = rocketBody.getSize().y / 2.0;
+	float halfWidth = rocketBody.getSize().x / 2.0;
+	float rotation = rocketBody.getRotation() + 90;
+	
+	topVector.x = halfHeight * cos(rotation * M_PI / 180.0);
+	topVector.y = halfHeight * sin(rotation * M_PI / 180.0);
+
+	bottomVector.x = topVector.x * -1;
+	bottomVector.y = topVector.y * -1;
+
+	rightVector.y = halfWidth * cos((360 - rotation) * M_PI / 180.0);
+	rightVector.x = halfWidth * sin((360 - rotation) * M_PI / 180.0);
+
+	leftVector.x = rightVector.x * -1;
+	leftVector.y = rightVector.y * -1;
+
+	rotatedShape.setPoint(0, rocketBody.getPosition() + topVector + rightVector);
+	rotatedShape.setPoint(1, rocketBody.getPosition() + bottomVector + rightVector);
+	rotatedShape.setPoint(2, rocketBody.getPosition() + bottomVector + leftVector);
+	rotatedShape.setPoint(3, rocketBody.getPosition() + topVector + leftVector);
+
+	return rotatedShape;
 }
