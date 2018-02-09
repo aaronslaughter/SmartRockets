@@ -199,13 +199,13 @@ void Rocket::mutate()
 
 		switch (instructionType)
 		{
-		case 1:	mainThrustInst[instructionIndex] ? mainThrustInst[instructionIndex] = false 
+		case 0:	mainThrustInst[instructionIndex] ? mainThrustInst[instructionIndex] = false 
 			: mainThrustInst[instructionIndex] = true;
 			break;
-		case 2: leftThrustInst[instructionIndex] ? leftThrustInst[instructionIndex] = false 
+		case 1: leftThrustInst[instructionIndex] ? leftThrustInst[instructionIndex] = false 
 			: leftThrustInst[instructionIndex] = true;
 			break;
-		case 3:	rightThrustInst[instructionIndex] ? rightThrustInst[instructionIndex] = false 
+		case 2:	rightThrustInst[instructionIndex] ? rightThrustInst[instructionIndex] = false 
 			: rightThrustInst[instructionIndex] = true;
 			break;
 		default:
